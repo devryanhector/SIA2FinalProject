@@ -7,8 +7,9 @@ const path = require('path');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const app = express();
+//test
 
-const PORT = process.env.PORT || 3004;
+const PORT = process.env.PORT;
 const HOST = 'localhost'
 
 const adminModel = require('./models/adminData.js');
