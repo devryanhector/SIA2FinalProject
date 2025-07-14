@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import Dashboard from './pages/Dashboard';
 import Menu from './pages/Products';
 import Login from './pages/Login';
@@ -14,7 +15,11 @@ import BackupAndRestore from './pages/BackupAndRestore';
 import ProtectedRoute from './components/ProtectedRoute';
 import Receipt from './pages/Receipt';
 import ViewSales from './pages/ViewSales';
+import ProductView from './pages/ProductView';
+import ForgotPassword from './pages/ForgotPassword';
+import Profile from './pages/Profile';
 import './App.css';
+import Billing from './pages/Billing';
 
 function App() {
   // Get userRole from localStorage
@@ -24,11 +29,19 @@ function App() {
     role: userRole || 'buyer',
   };
 
+  // Cart state (shared)
+  const [cart, setCart] = useState(() => {
+    const saved = localStorage.getItem('cart');
+    return saved ? JSON.parse(saved) : [];
+  });
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
+
   return (
     <BrowserRouter>
-      {/* <MainNavbar /> */}
       <Routes>
-        <Route path="/" element={<Dashboard user={user} />} />
+        <Route path="/" element={<Dashboard user={user} cart={cart} setCart={setCart} />} />
         <Route path="/Products" element={<Menu />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
@@ -49,13 +62,19 @@ function App() {
         <Route path="/ShoppingList" element={<ShoppingList />} />
         <Route path="/BackupAndRestore" element={<BackupAndRestore />} />
         <Route path="/receipt" element={<Receipt />} />
-        <Route path="/dashboard" element={<Dashboard user={user} />} />
+        <Route path="/dashboard" element={<Dashboard user={user} cart={cart} setCart={setCart} />} />
         <Route path="/ViewSales" element={
           <ProtectedRoute allowedRoles={['seller', 'admin']}>
             <ViewSales />
           </ProtectedRoute>
         } />
+        <Route path="/product/:id" element={<ProductView />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/billing" element={<Billing cart={cart} setCart={setCart} />} />
       </Routes>
+      {/* Pass cart to Navbar globally if needed */}
+      {/* <Navbar cart={cart} setCart={setCart} /> */}
     </BrowserRouter>
   );
 }

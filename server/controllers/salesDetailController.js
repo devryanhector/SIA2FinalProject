@@ -1,4 +1,5 @@
 const SalesDetail = require('../models/SalesDetails');
+const User = require('../models/userModel');
 
 // Create a new sales detail
 const createSalesDetail = async (req, res) => {
@@ -24,7 +25,7 @@ const createSalesDetail = async (req, res) => {
 // Get all sales details
 const getAllSalesDetails = async (req, res) => {
   try {
-    const salesDetails = await SalesDetail.find();
+    const salesDetails = await SalesDetail.find().populate('buyer', 'username');
     res.status(200).json(salesDetails);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching sales details', error });
@@ -34,7 +35,7 @@ const getAllSalesDetails = async (req, res) => {
 // Get a single sales detail by ID
 const getSalesDetailById = async (req, res) => {
   try {
-    const salesDetail = await SalesDetail.findById(req.params.id);
+    const salesDetail = await SalesDetail.findById(req.params.id).populate('buyer', 'username');
 
     if (!salesDetail) {
       return res.status(404).json({ message: 'Sales detail not found' });
@@ -82,10 +83,23 @@ const deleteSalesDetailById = async (req, res) => {
   }
 };
 
+// Get purchase history for a user (by userId)
+const getPurchaseHistoryForUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    // Find all sales where buyer matches the logged-in user
+    const sales = await SalesDetail.find({ buyer: userId }).sort({ date: -1 });
+    res.json({ history: sales });
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching purchase history', error });
+  }
+};
+
 module.exports = {
   createSalesDetail,
   getAllSalesDetails,
   getSalesDetailById,
   updateSalesDetailById,
-  deleteSalesDetailById
+  deleteSalesDetailById,
+  getPurchaseHistoryForUser
 };

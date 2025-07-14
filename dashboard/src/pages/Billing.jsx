@@ -1,4 +1,4 @@
-import React from 'react';
+import React from 'react';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
 import {
     Button,
     // TextField,
@@ -9,7 +9,7 @@ import {
     Backdrop,
     Fade,
     Paper,
-    Typography
+    Typography                                          
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
@@ -91,7 +91,7 @@ const Billing = ({
             }
             navigate('/receipt', {
                 replace: true,
-                state: {
+                state: { 
                     cart,
                     total: getTotalPrice()
                 }

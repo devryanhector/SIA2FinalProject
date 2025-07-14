@@ -12,7 +12,8 @@ import AccountCircle from '@mui/icons-material/AccountCircle';
 import Lock from '@mui/icons-material/Lock';
 import axios from 'axios';
 import './Login.css';
-import loginImage from '../../public/logo.jpg'; // Adjust path as necessary
+// Use the new red Bookly logo for login
+const loginImage = '/Red_Booklyp.png';
 
 function Login() {
   const [ModalStudOpen, setModalStudOpen] = useState(true);
@@ -47,7 +48,7 @@ function Login() {
     if (loginID === sellerEmail && password === sellerPassword) {
       localStorage.setItem('token', 'dummy_seller_token');
       localStorage.setItem('userRole', 'seller');
-      navigate('/dashboard');
+      navigate('/ManageProduct'); // Direct seller to Manage Books
       return;
     }
 
@@ -85,12 +86,12 @@ function Login() {
 
   return (
     <Modal open={ModalStudOpen} onClose={handleCloseStudModal}>
-      <div className="login-modal">
-        <div className="main-login-form">
-          <div className="login-form">
-            <img src={loginImage} alt="Login" className="login-image" />
-            <h1>Login</h1>
-            <div className="login-forms">
+      <div className="login-modal" style={{ background: '#FFF8F0', borderRadius: 16, boxShadow: '0 4px 32px rgba(128,0,32,0.10)', padding: 0 }}>
+        <div className="main-login-form" style={{ background: '#FFF8F0', borderRadius: 16 }}>
+          <div className="login-form" style={{ boxShadow: '0 2px 16px rgba(128,0,32,0.08)', borderRadius: 16, padding: 32, background: '#FFF8F0', minWidth: 340, maxWidth: 400, margin: 'auto' }}>
+            <img src={loginImage} alt="Login" className="login-image" style={{ width: 80, height: 80, objectFit: 'contain', marginBottom: 12, borderRadius: 12, background: '#FFF8F0', border: '2px solid #800020', boxShadow: '0 2px 8px rgba(128,0,32,0.10)', display: 'block', marginLeft: 'auto', marginRight: 'auto', filter: 'drop-shadow(0 0 2px #80002022)' }} />
+            <h1 style={{ color: '#800020', fontWeight: 700, marginBottom: 18, fontFamily: 'serif', letterSpacing: 1 }}>Login</h1>
+            <div className="login-forms" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
               <TextField
                 value={loginID}
                 onChange={(e) => {
@@ -107,10 +108,12 @@ function Login() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <AccountCircle />
+                      <AccountCircle sx={{ color: '#800020' }} />
                     </InputAdornment>
-                  )
+                  ),
+                  style: { background: '#FFF8F0', borderRadius: 8 }
                 }}
+                InputLabelProps={{ style: { color: '#800020' } }}
               />
               <TextField
                 value={password}
@@ -121,7 +124,7 @@ function Login() {
                 id="outlined-password"
                 label="Password"
                 variant="outlined"
-                type={showPassword ? 'text' : 'password'}
+                type="password"
                 required
                 error={!!passwordError}
                 helperText={passwordError}
@@ -129,27 +132,36 @@ function Login() {
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      <Lock />
+                      <Lock sx={{ color: '#800020' }} />
                     </InputAdornment>
-                  )
+                  ),
+                  style: { background: '#FFF8F0', borderRadius: 8 }
                 }}
+                InputLabelProps={{ style: { color: '#800020' } }}
               />
-
-              <FormControlLabel
+              {/* Forgot Password link for buyers */}
+              {(!loginID || (!loginID.includes('admin') && !loginID.includes('seller'))) && (
+                <div style={{ width: '100%', textAlign: 'right', marginTop: 4 }}>
+                  <a href="/forgot-password" style={{ color: '#D95D39', fontWeight: 500, fontSize: 15, textDecoration: 'underline', cursor: 'pointer' }}>
+                    Forgot password?
+                  </a>
+                </div>
+              )}
+              {/* <FormControlLabel
                 control={
                   <Checkbox
                     checked={showPassword}
                     onChange={(e) => setShowPassword(e.target.checked)}
+                    sx={{ color: '#800020', '&.Mui-checked': { color: '#800020' } }}
                   />
                 }
-                label="Show Password"
-              />
-
+                label={<span style={{ color: '#800020' }}>Show Password</span>}
+              /> */}
               <Button
                 variant="contained"
                 onClick={handleSubmit}
                 className="login-button sign-in"
-                style={{ backgroundColor: 'black', color: 'white' }}
+                style={{ backgroundColor: '#800020', color: 'white', fontWeight: 600, borderRadius: 8, fontSize: 18, boxShadow: '0 2px 8px rgba(128,0,32,0.10)' }}
               >
                 Login
               </Button>
@@ -157,18 +169,17 @@ function Login() {
                 variant="contained"
                 onClick={handleCloseStudModal}
                 className="login-button cancel"
-                style={{ backgroundColor: 'black', color: 'white' }}
+                style={{ backgroundColor: '#D95D39', color: 'white', fontWeight: 600, borderRadius: 8, fontSize: 18, boxShadow: '0 2px 8px rgba(217,93,57,0.10)' }}
               >
                 Cancel
               </Button>
-
               {/* Register button only shown for non-admin/non-seller */}
               {loginID !== 'admin@system.com' && loginID !== 'seller@system.com' && (
                 <Button
                   variant="outlined"
                   onClick={handleRegisterClick}
                   className="login-button register"
-                  style={{ borderColor: 'black', color: 'black', height: '56px' }}
+                  style={{ borderColor: '#800020', color: '#800020', height: '56px', fontWeight: 600, borderRadius: 8, fontSize: 18 }}
                 >
                   Register
                 </Button>

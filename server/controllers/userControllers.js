@@ -9,19 +9,57 @@ exports.createUser = async (req, res) => {
   try {
     const { username, email, password, userRole } = req.body;
 
+    // Check for duplicate email or username
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(409).json({ message: 'User already exists with this email or username' });
+    }
+
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
-      username,
-      email,
+      username: username,
+      email: email,
       password: hashedPassword,
-      userRole // Optionally include user role during user creation
+      userRole: userRole // Optionally include user role during user creation
     });
 
     const savedUser = await user.save();
     res.status(201).json({ message: 'User created successfully', user: savedUser });
   } catch (error) {
+    console.error('Registration error:', error); // Log the real error
     res.status(400).json({ message: 'Error creating user', error });
+  }
+};
+
+// Register a new user (same as createUser for now)
+exports.registerUser = async (req, res) => {
+  try {
+    const { username, email, password, userRole } = req.body;
+    // Check for duplicate email or username
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(409).json({ message: 'User already exists with this email or username' });
+    }
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: 'All fields are required' });
+    }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      username: username,
+      email: email,
+      password: hashedPassword,
+      userRole: userRole || 'user'
+    });
+    const savedUser = await user.save();
+    res.status(201).json({ message: 'User registered successfully', user: savedUser });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(400).json({ message: 'Error registering user', error });
   }
 };
 
@@ -89,7 +127,8 @@ exports.loginUser = async (req, res) => {
   const { loginID, password } = req.body;
 
   try {
-    const user = await User.findOne({ email: loginID });
+    // Accept login by username or email
+    const user = await User.findOne({ $or: [ { email: loginID }, { username: loginID } ] });
 
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
@@ -104,8 +143,9 @@ exports.loginUser = async (req, res) => {
       return res.status(403).json({ message: 'Only buyers can login here' });
     }
 
+    // Ensure token contains correct id and username (use _id as string)
     const token = jwt.sign(
-      { id: user._id, role: user.userRole },
+      { id: user._id ? user._id.toString() : user.id, username: user.username, role: user.userRole },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
@@ -117,6 +157,26 @@ exports.loginUser = async (req, res) => {
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+// Forgot password (simple: set new password by email)
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    if (!email || !newPassword) {
+      return res.status(400).json({ message: 'Email and new password are required' });
+    }
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.status(200).json({ message: 'Password reset successful' });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Error resetting password', error });
   }
 };
 

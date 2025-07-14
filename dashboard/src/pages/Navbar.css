@@ -1,5 +1,5 @@
 .navbar {
-  background-color: rgb(255, 255, 255);
+  background-color: #7B1E3D;
   overflow: hidden;
   position: sticky;
   height: 100px;
@@ -28,7 +28,7 @@
   /* Ensure the logo fits within the navbar height */
   width: auto;
   /* Maintain aspect ratio */
-  padding: 10px;
+  padding: 50px;
   /* Add inner spacing */
 }
 

@@ -1,13 +1,34 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { IconButton, Modal, Box, Typography } from '@mui/material';
-import { Person, ShoppingCart } from '@mui/icons-material';
+import {
+  IconButton,
+  Modal,
+  Box,
+  Typography,
+  InputBase,
+  Menu,
+  MenuItem,
+  Badge,
+  Button,
+  Divider,
+  Snackbar,
+  Alert
+} from '@mui/material';
+import {
+  Person,
+  ShoppingCart,
+  ExpandMore
+} from '@mui/icons-material';
 import './Navbar.css';
 
-function Navbar() {
+function Navbar({ cart = [], onRemoveFromCart = () => {}, scrollToImageSection }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState('');
   const [cartOpen, setCartOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
+  const [logoutMsgOpen, setLogoutMsgOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,54 +38,111 @@ function Navbar() {
   }, [isLoggedIn, userRole]);
 
   const handleLogout = () => {
-    localStorage.clear(); // Remove all user data
+    localStorage.clear();
     setIsLoggedIn(false);
     setUserRole('');
-    navigate('/dashboard'); // Go to dashboard for all users (not logged in)
+    setLogoutMsgOpen(true);
   };
 
   const handleCartOpen = () => setCartOpen(true);
   const handleCartClose = () => setCartOpen(false);
 
+  const genres = ['All', 'Action', 'Manga', 'Horror'];
+  const handleGenreClick = (event) => setAnchorEl(event.currentTarget);
+  const handleGenreClose = () => setAnchorEl(null);
+
+  const handleSettingsClick = (event) => setSettingsAnchorEl(event.currentTarget);
+  const handleSettingsClose = () => setSettingsAnchorEl(null);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (search.trim()) navigate(`/search?q=${encodeURIComponent(search)}`);
+  };
+
+  const totalPrice = cart.reduce(
+    (total, item) => total + (item.price || 0) * (item.quantity || 1),
+    0
+  );
+
   return (
-    <nav className="navbar">
-      {/* Logo */}
-      <div className="logo-img">
-        <img src="logo.jpg" alt="logo" />
+    <nav className="navbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+      {/* Left: Logo + Search */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+        <div className="logo-img">
+          <img src="/White_Minimalist_Design.png" alt="Bookly Logo" />
+        </div>
+        <form className="navbar-search" onSubmit={handleSearch} style={{ marginLeft: 0, marginRight: 0 }}>
+          <InputBase
+            placeholder="Search books or authors..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            sx={{ background: '#f1f1f1', borderRadius: 2, padding: '2px 10px', width: 220 }}
+          />
+        </form>
       </div>
 
-      {/* Links */}
-      <div className="navbar-links">
-        <Link to="/" className="navbar-link">Home</Link>
-        <Link to="/Products" className="navbar-link">Books</Link>
-
-        {isLoggedIn && (userRole === 'admin' || userRole === 'seller') && (
-          <Link to="/ManageProduct" className="navbar-link">Manage Product</Link>
-        )}
-        {isLoggedIn && userRole === 'seller' && (
-          <Link to="/ViewSales" className="navbar-link">View Sales</Link>
-        )}
-        {isLoggedIn && userRole === 'admin' && (
-          <Link to="/ManageAccount" className="navbar-link">Manage Account</Link>
-        )}
-
+      {/* Right: Nav Links + Cart & Profile */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+        <Link to="/" className="navbar-link" style={{ color: 'white', fontWeight: 'bold' }} onClick={e => {
+          e.preventDefault();
+          navigate('/');
+          if (typeof scrollToImageSection === 'function') {
+            setTimeout(() => scrollToImageSection(), 100);
+          }
+        }}>Home</Link>
+        <Link
+          to="/"
+          className="navbar-link"
+          style={{ color: 'white', fontWeight: 'bold' }}
+          onClick={e => {
+            e.preventDefault();
+            navigate('/');
+            setTimeout(() => {
+              const menu = document.querySelector('.menu');
+              if (menu) menu.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+          }}
+        >
+          Books
+        </Link>
+        <IconButton onClick={handleGenreClick} sx={{ color: 'white', fontWeight: 'bold' }}>
+          Categories <ExpandMore />
+        </IconButton>
+        <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleGenreClose}>
+          {genres.map((genre) => (
+            <MenuItem key={genre} onClick={handleGenreClose}>{genre}</MenuItem>
+          ))}
+        </Menu>
+        <IconButton sx={{ color: 'white' }} onClick={handleCartOpen} title="Cart">
+          <Badge badgeContent={cart.reduce((sum, item) => sum + (item.quantity || 1), 0)} color="secondary">
+            <ShoppingCart />
+          </Badge>
+        </IconButton>
+        {/* Profile/Account Icon */}
         {isLoggedIn ? (
-          <>
-            {/* Shopping cart button (only if logged in) */}
-            <IconButton color="inherit" onClick={handleCartOpen}>
-              <ShoppingCart />
-            </IconButton>
-
-            {/* Logout button */}
-            <IconButton color="inherit" onClick={handleLogout}>
-              <Person />
-            </IconButton>
-          </>
+          <IconButton
+            sx={{ color: 'white' }}
+            onClick={handleSettingsClick}
+            title="Account Menu"
+          >
+            <Person />
+          </IconButton>
         ) : (
-          <IconButton color="inherit" component={Link} to="/login">
+          <IconButton
+            sx={{ color: 'white' }}
+            component={Link}
+            to="/login"
+            title="Login or Register"
+          >
             <Person />
           </IconButton>
         )}
+        {/* Account Dropdown Menu */}
+        <Menu anchorEl={settingsAnchorEl} open={Boolean(settingsAnchorEl)} onClose={handleSettingsClose}>
+          <MenuItem onClick={handleSettingsClose} component={Link} to="/profile">Profile</MenuItem>
+          <MenuItem onClick={handleSettingsClose} component={Link} to="/settings">Settings</MenuItem>
+          <MenuItem onClick={() => { handleSettingsClose(); handleLogout(); }}>Logout</MenuItem>
+        </Menu>
       </div>
 
       {/* Cart Modal */}
@@ -80,22 +158,63 @@ function Navbar() {
             top: '50%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '80%',
-            maxWidth: 400,
+            width: '90%',
+            maxWidth: 450,
             bgcolor: 'background.paper',
             border: '2px solid #000',
             boxShadow: 24,
-            p: 4,
+            p: 3,
+            maxHeight: '80vh',
+            overflowY: 'auto'
           }}
         >
-          <Typography id="cart-modal-title" variant="h6">
+          <Typography id="cart-modal-title" variant="h6" mb={2}>
             Cart Items
           </Typography>
-          <Typography id="cart-modal-description" sx={{ mt: 2 }}>
-            Your cart is currently empty.
-          </Typography>
+          {cart.length === 0 ? (
+            <Typography>Your cart is currently empty.</Typography>
+          ) : (
+            <>
+              {cart.map((item, index) => (
+                <Box key={item._id || index} display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+                  <div>
+                    <Typography fontWeight={600}>{item.name}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      ₱{item.price} × {item.quantity || 1}
+                    </Typography>
+                  </div>
+                  <Button
+                    size="small"
+                    color="error"
+                    variant="outlined"
+                    onClick={() => onRemoveFromCart(item._id)}
+                  >
+                    Remove
+                  </Button>
+                </Box>
+              ))}
+              <Divider sx={{ my: 2 }} />
+              <Typography fontWeight={600} mb={1}>
+                Total: ₱{totalPrice}
+              </Typography>
+              <Button variant="contained" color="primary" fullWidth onClick={() => {
+                if (cart.length === 0) return;
+                handleCartClose();
+                navigate('/billing');
+              }}>
+                Checkout
+              </Button>
+            </>
+          )}
         </Box>
       </Modal>
+
+      {/* Logout Snackbar */}
+      <Snackbar open={logoutMsgOpen} autoHideDuration={3000} onClose={() => setLogoutMsgOpen(false)} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        <Alert onClose={() => setLogoutMsgOpen(false)} severity="success" sx={{ width: '100%' }}>
+          Successfully logged out.
+        </Alert>
+      </Snackbar>
     </nav>
   );
 }

@@ -8,6 +8,13 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -46,7 +53,7 @@ const ManageProduct = () => {
     }, []);
 
     // const categories = ['All', 'Books', 'Arts & Crafts', 'Coloring Supplies', 'Filling Supplies', 'Paper Supplies', 'Writing Supplies', 'School & Office Essentials'];
-    const categories = ['All', 'Anime', 'Action', 'Horror'];
+    const categories = ['All', 'Manga', 'Action', 'Horror'];
     const handleCategoryChange = (category) => {
         setSelectedCategory(category);
     };
@@ -186,11 +193,11 @@ const ManageProduct = () => {
             }
 
             const data = {
-                productId: _id,
+                productId: _id, // MongoDB _id
                 productName,
                 productDescription,
                 price, // send price
-                stock, // send stock
+                stock: Number(stock), // ensure stock is a number
                 category: productCategory
             };
 
@@ -225,21 +232,16 @@ const ManageProduct = () => {
                     <DashboardIcon sx={{ marginRight: '10px' }} />
                     Manage Books
                 </Link>
-                {/* Only show Manage Account for admin */}
                 {localStorage.getItem('userRole') === 'admin' && (
                     <Link to="/ManageAccount" className="sidebar-link">
                         <AccountBoxIcon sx={{ marginRight: '10px' }} />
-                        Manage Account
+                        Manage Users
                     </Link>
                 )}
                 <Link to="/ViewSales" className="sidebar-link">
                     <DashboardIcon sx={{ marginRight: '10px' }} />
                     View Sales
                 </Link>
-                {/* <Link to="/BackupandRestore" className="sidebar-link sidebar-link">
-                    <ExitToAppIcon sx={{ marginRight: '10px' }} />
-                    Backup and Restore
-                </Link> */}
                 <Link to="/" className="sidebar-link logout-link">
                     <ExitToAppIcon sx={{ marginRight: '10px' }} />
                     Logout
@@ -249,7 +251,6 @@ const ManageProduct = () => {
             {/* Header */}
             <div className="header">
                 <h2>Manage Books</h2>
-                <Button variant="contained" onClick={handleOpenAddModal}>Add</Button>
             </div>
 
             {/* Category Filter */}
@@ -259,12 +260,13 @@ const ManageProduct = () => {
                         key={category}
                         variant={selectedCategory === category ? 'contained' : 'outlined'}
                         onClick={() => handleCategoryChange(category)}
-                        sx={{ marginRight: '10px', marginBottom: '10px' }}
+                        sx={{ marginRight: '10px', marginBottom: '10px', minWidth: 120 }}
                         className="category-button"
                     >
                         {category}
                     </Button>
                 ))}
+                <Button variant="contained" onClick={handleOpenAddModal} style={{ marginLeft: 16, minWidth: 120, marginBottom: '10px' }}>Add</Button>
             </div>
 
             {/* Add Product Modal */}
@@ -392,8 +394,55 @@ const ManageProduct = () => {
                 </div>
             </Modal>
 
-            {/* Product Cards */}
-            <div className="edit-menu-container">
+            {/* Product Table */}
+            <TableContainer component={Paper} style={{ marginTop: 20 }}>
+                <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell style={{ width: 80 }}>Image</TableCell>
+                            <TableCell style={{ width: 120 }}>Title</TableCell>
+                            <TableCell style={{ width: 350 }}>Description</TableCell>
+                            <TableCell style={{ width: 120 }}>Category</TableCell>
+                            <TableCell style={{ width: 100 }}>Price</TableCell>
+                            <TableCell style={{ width: 100 }}>Stock</TableCell>
+                            <TableCell style={{ width: 180 }}>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filteredValues?.map((pro) => (
+                            <TableRow key={pro?._id}>
+                                <TableCell>
+                                    <img src={`http://localhost:3004/uploads/${pro?.image}`} alt='' style={{ width: 60, height: 60, objectFit: 'cover' }} />
+                                </TableCell>
+                                <TableCell>{pro?.name}</TableCell>
+                                <TableCell style={{ maxWidth: 350, minWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={pro?.description}>
+                                    {pro?.description && pro.description.length > 90
+                                        ? pro.description.slice(0, 90) + '...'
+                                        : pro?.description}
+                                </TableCell>
+                                <TableCell>{pro?.category}</TableCell>
+                                <TableCell>{pro?.price}</TableCell>
+                                <TableCell>{pro?.stock}</TableCell>
+                                <TableCell>
+                                    <Button variant="outlined" onClick={() => handleOpenEditModal(pro)} style={{ marginRight: 8 }}>Edit</Button>
+                                    <Button variant="outlined" color="error" onClick={() => { setSelectedProduct({
+                                        _id: pro?._id,
+                                        productName: pro?.name,
+                                        productDescription: pro?.description,
+                                        productCategory: pro?.category,
+                                        image: pro?.image,
+                                        price: pro?.price,
+                                        stock: pro?.stock
+                                    }); setModalEditOpen(true); }}>Delete</Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            {/* Product Cards (hidden, replaced by table) */}
+            {/* <div className="edit-menu-container">
                 {filteredValues?.map((pro) => (
                     <div key={pro?._id} className="card-edit" onClick={() => handleOpenEditModal(pro)}>
                         <div className="image-container">
@@ -407,7 +456,7 @@ const ManageProduct = () => {
                         </div>
                     </div>
                 ))}
-            </div>
+            </div> */}
         </div>
     );
 };

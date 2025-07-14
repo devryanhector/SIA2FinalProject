@@ -1,27 +1,29 @@
 .add-button {
-  background-color: black !important;
-  color: white !important;
+  background-color: #7B1E3D !important;
+  color: #FFF8F0 !important;
   transition: background-color 0.3s;
 }
 
 .add-button:hover {
-  background-color: gray !important;
+  background-color: #D95D39 !important;
+  color: #FFF8F0 !important;
 }
 
 .add-button,
 .view-modal .MuiButtonBase-root {
-background-color: black !important;
-color: white !important;
+background-color: #7B1E3D !important;
+color: #FFF8F0 !important;
 transition: background-color 0.3s;
 }
 
 .add-button:hover,
 .view-modal .MuiButtonBase-root:hover {
-background-color: gray !important;
+background-color: #D95D39 !important;
+color: #FFF8F0 !important;
 }
 
 .header h2 {
-  color: black;
+  color: #7B1E3D;
 }
 
 .admin-dashboard-container {
@@ -29,6 +31,10 @@ background-color: gray !important;
   flex-direction: column;
   align-items: center;
   padding: 30px;
+  background: #FFF8F0;
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(123,30,61,0.10);
+  border: 2.5px solid #7B1E3D;
 }
 
 .sidebar {
@@ -37,7 +43,7 @@ background-color: gray !important;
   top: 0;
   height: 100%;
   width: 300px;
-  background-color: #0C1C8D;
+  background-color: #7B1E3D;
   transition: left 0.3s ease;
   z-index: 1000;
   display: flex;
@@ -47,7 +53,7 @@ background-color: gray !important;
 }
 
 .sidebar-link {
-  color: white;
+  color: #FFF8F0;
   text-decoration: none;
   margin: 15px 0;
   padding: 10px 15px;
@@ -56,8 +62,8 @@ background-color: gray !important;
 }
 
 .sidebar-link:hover {
-  background-color: rgb(158, 158, 158);
-  color: #323031;
+  background-color: #D95D39;
+  color: #FFF8F0;
 }
 
 .header {
@@ -70,12 +76,12 @@ background-color: gray !important;
 }
 
 h2 {
-  color: #0C1C8D;
+  color: #7B1E3D;
 }
 
 .header Button {
-  background-color: #0C1C8D;
-  color: #FFF;
+  background-color: #7B1E3D;
+  color: #FFF8F0;
   padding: 9px 70px; /* Adjust padding to increase button width and height */
   border: none;
   border-radius: 6px;
@@ -86,8 +92,8 @@ h2 {
 }
 
 .header Button:hover {
-  background-color: #FCDB00;
-  color: #0C1C8D;
+  background-color: #D95D39;
+  color: #FFF8F0;
 }
 
 /* modal */
@@ -236,8 +242,8 @@ h2 {
 .header Button,
 .btn-add Button,
 .card-edit:hover {
-  background-color: black !important;
-  color: white !important;
+  background-color: #7B1E3D !important;
+  color: #FFF8F0 !important;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -246,17 +252,19 @@ h2 {
 .header Button:hover,
 .btn-add Button:hover,
 .card-edit:hover {
-  background-color: gray !important;
+  background-color: #D95D39 !important;
+  color: #FFF8F0 !important;
 }
 
 .category-button {
-background-color: black !important;
-color: white !important;
+background-color: #7B1E3D !important;
+color: #FFF8F0 !important;
 transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .category-button:hover {
-background-color: gray !important;
+background-color: #D95D39 !important;
+color: #FFF8F0 !important;
 }
 
 
@@ -266,7 +274,7 @@ background-color: gray !important;
   top: 0;
   height: 100%;
   width: 300px;
-  background-color: #000000; /* Black background */
+  background-color: #7B1E3D; /* Black background */
   transition: left 0.3s ease;
   z-index: 1000;
   display: flex;
@@ -279,7 +287,7 @@ background-color: gray !important;
 .sidebar-link {
   display: flex;
   align-items: center;
-  color: white;
+  color: #FFF8F0;
   text-decoration: none;
   margin-bottom: 15px; /* Adjust margin between links */
   padding: 10px 15px;
@@ -288,7 +296,8 @@ background-color: gray !important;
 }
 
 .sidebar-link:hover {
-  background-color: #434343; /* Darker shade of gray on hover */
+  background-color: #D95D39; /* Darker shade of gray on hover */
+  color: #FFF8F0;
   text-decoration: none; /* Remove underline on hover */
 }
 

@@ -6,10 +6,10 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const jwt = require('jsonwebtoken');
+const os = require('os');
 const app = express();
-//test
 
-const PORT = process.env.PORT;
+// const PORT = process.env.PORT || 3004;
 const HOST = 'localhost'
 
 const adminModel = require('./models/adminData.js');
@@ -20,6 +20,7 @@ const userModel = require('./models/userModel.js');
 
 const salesDetailRoutes = require('./routes/salesDetailRoutes');
 const reportRoutes = require('./routes/reportRoutes.js');
+const productRoutes = require('./routes/productRoutes');
 // const userRoutes = require('./controllers/userControllers.js')
 
 
@@ -44,9 +45,9 @@ app.use(express.json());
 app.use(cors());
 
 app.use('/api', userRoutes);
-
 app.use('/api/salesdetails', salesDetailRoutes);
 app.use('/api/reportdetails', reportRoutes);
+app.use('/', productRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -60,9 +61,30 @@ const ConnectToDatabase = async () => {
     }
 }
 
-app.listen(3004, 'localhost', () => {
-    console.log(`Listening: http://localhost:3004`);
-})
+function getLocalIP() { 
+    const nets = os.networkInterfaces(); 
+    for (const name of Object.keys(nets)) { 
+    for (const net of nets [name]) {
+         if (net.family === "IPv4" && !net.internal) { 
+            return net.address;
+         } 
+        } 
+    } 
+     return "localhost";
+     } 
+     // Start server 
+const PORT = process.env.PORT || 3004; 
+const IP = getLocalIP(); 
+
+// Export for use in controllers 
+module.exports.SERVER_PORT - PORT; 
+module.exports.SERVER_IP - IP; 
+
+app.listen(PORT, '0.0.0.0', () => {
+     console.log(' Server running at:'); 
+    console.log(`Local:   http://localhost:${PORT}`);
+    console.log(`Network: http://${IP}:${PORT}`);
+});
 
 ConnectToDatabase()
 

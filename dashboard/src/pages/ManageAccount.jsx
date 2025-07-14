@@ -3,10 +3,13 @@ import { Link } from 'react-router-dom';
 import './ManageAccount.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { IconButton, Modal, Box, TextField, Button, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { IconButton, Modal, Box, TextField, Button, Select, MenuItem, InputLabel, FormControl, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import Register from './Register';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 function ManageAccount() {
   const [users, setUsers] = useState([]);
@@ -90,11 +93,26 @@ function ManageAccount() {
   return (
     <div className="manage-account-container">
       <div className="sidebar">
-        <Link to="/ManageProduct" className="sidebar-link">Back</Link>
+        <Link to="/ManageProduct" className="sidebar-link">
+          <DashboardIcon sx={{ marginRight: '10px' }} />
+          Manage Books
+        </Link>
+        <Link to="/ManageAccount" className="sidebar-link">
+          <AccountBoxIcon sx={{ marginRight: '10px' }} />
+          Manage Users
+        </Link>
+        <Link to="/ViewSales" className="sidebar-link">
+          <DashboardIcon sx={{ marginRight: '10px' }} />
+          View Sales
+        </Link>
+        <Link to="/" className="sidebar-link logout-link">
+          <ExitToAppIcon sx={{ marginRight: '10px' }} />
+          Logout
+        </Link>
       </div>
       <div className="content">
         <div className="head">
-          <h1 className="h1-center">Manage Account</h1>
+          <h2 className="h1-center">Manage Users</h2>
           <TextField
             label="Search Usernames"
             variant="outlined"
@@ -104,38 +122,42 @@ function ManageAccount() {
           />
           <br />
           <br />
-          <Button variant="contained" color="primary" onClick={handleRegisterModalOpen}>
+          <Button variant="contained" color="primary" onClick={handleRegisterModalOpen} sx={{ minWidth: 120, float: 'right' }}>
             Add User
           </Button>
         </div>
         <br />
-        <table className="user-table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Email</th>
-              <th>User Role</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map(user => (
-              <tr key={user._id}>
-                <td>{user.username}</td>
-                <td>{user.email}</td>
-                <td>{user.userRole}</td>
-                <td className="actions">
-                  <IconButton onClick={() => deleteUser(user._id)} color="error">
-                    <DeleteIcon />
-                  </IconButton>
-                  <IconButton onClick={() => handleEditClick(user)} color="primary">
-                    <EditIcon />
-                  </IconButton>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <TableContainer component={Paper} style={{ marginTop: 20 }}>
+          <Table style={{ tableLayout: 'fixed', width: '100%' }}>
+            <TableHead>
+              <TableRow>
+                <TableCell style={{ width: 180 }}>Username</TableCell>
+                <TableCell style={{ width: 250 }}>Email</TableCell>
+                <TableCell style={{ width: 250 }}>Password</TableCell>
+                <TableCell style={{ width: 120 }}>User Role</TableCell>
+                <TableCell style={{ width: 180 }}>Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredUsers.map(user => (
+                <TableRow key={user._id}>
+                  <TableCell>{user.username}</TableCell>
+                  <TableCell style={{ maxWidth: 250, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.email}>
+                    {user.email && user.email.length > 30 ? user.email.slice(0, 30) + '...' : user.email}
+                  </TableCell>
+                  <TableCell style={{ maxWidth: 250, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={user.password}>
+                    {user.password && user.password.length > 30 ? user.password.slice(0, 30) + '...' : user.password}
+                  </TableCell>
+                  <TableCell>{user.userRole}</TableCell>
+                  <TableCell>
+                    <Button variant="outlined" color="primary" onClick={() => handleEditClick(user)} style={{ marginRight: 8 }} startIcon={<EditIcon />}>Edit</Button>
+                    <Button variant="outlined" color="error" onClick={() => deleteUser(user._id)} startIcon={<DeleteIcon />}>Delete</Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </div>
 
       <Modal open={isEditModalOpen} onClose={handleEditModalClose}>
@@ -155,6 +177,17 @@ function ManageAccount() {
             name="email"
             value={selectedUser?.email || ''}
             onChange={handleInputChange}
+            margin="normal"
+          />
+          <TextField
+            fullWidth
+            label="Password"
+            name="password"
+            value={selectedUser?.password || ''}
+            onChange={handleInputChange}
+            type="password"
+            required
+            error={!selectedUser?.password}
             margin="normal"
           />
           <FormControl fullWidth margin="normal">

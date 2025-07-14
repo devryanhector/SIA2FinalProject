@@ -36,9 +36,9 @@ body {
 }
 
 .login-image {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
+    width: 400px;
+    height: 400px;
+    border-radius: 100%;
     margin-bottom: 10px;
 }
 

@@ -4,8 +4,10 @@ const {
   getAllSalesDetails,
   getSalesDetailById,
   updateSalesDetailById,
-  deleteSalesDetailById
+  deleteSalesDetailById,
+  getPurchaseHistoryForUser
 } = require('../controllers/salesDetailController');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const router = express.Router();
 
@@ -23,5 +25,8 @@ router.put('/:id', updateSalesDetailById);
 
 // Route to delete a sales detail by ID
 router.delete('/:id', deleteSalesDetailById);
+
+// Route to get purchase history for logged-in user
+router.get('/user/history', authMiddleware, getPurchaseHistoryForUser);
 
 module.exports = router;
