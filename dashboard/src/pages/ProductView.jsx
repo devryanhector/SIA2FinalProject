@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './ProductView.css';
+import API from './api';
 
 const ProductView = () => {
   const { id } = useParams();
@@ -12,7 +13,7 @@ const ProductView = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`http://localhost:3004/getproduct/${id}`);
+        const res = await axios.get(API.GET_PRODUCT(id));
         setProduct(res.data?.data);
       } catch (err) {
         setError('Product not found.');
@@ -29,7 +30,7 @@ const ProductView = () => {
       <button className="product-view-back" onClick={() => navigate(-1)}>&larr; Back</button>
       <div className="product-view-card">
         <div className="product-view-image">
-          <img src={`http://localhost:3004/uploads/${product.image}`} alt={product.name} />
+          <img src={`${API.UPLOADS}${product.image}`} alt={product.name} />
         </div>
         <div className="product-view-details">
           <h2>{product.name}</h2>

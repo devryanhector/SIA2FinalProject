@@ -22,6 +22,7 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 import axios from 'axios';
+import API from './api';
 import './ManageProduct.css';
 
 const ManageProduct = () => {
@@ -142,7 +143,7 @@ const ManageProduct = () => {
             for (let pair of formData.entries()) {
                 console.log(pair[0] + ': ' + pair[1]);
             }
-            await axios.post('http://localhost:3004/addproduct', formData, {
+            await axios.post(API.ADD_PRODUCT, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -168,7 +169,7 @@ const ManageProduct = () => {
 
     const handleDeleteProduct = async () => {
         try {
-            await axios.post('http://localhost:3004/deleteproduct', { productId: selectedProduct._id });
+            await axios.post(API.DELETE_PRODUCT, { productId: selectedProduct._id });
             setValues((prev) => prev.filter((product) => product._id !== selectedProduct._id));
             handleCloseEditModal();
         } catch (error) {
@@ -201,7 +202,7 @@ const ManageProduct = () => {
                 category: productCategory
             };
 
-            const response = await axios.post('http://localhost:3004/editproduct', data, {
+            const response = await axios.post(API.EDIT_PRODUCT, data, {
                 headers: {
                     'Content-Type': 'application/json'
                 }
@@ -220,7 +221,7 @@ const ManageProduct = () => {
     };
 
     const fetchMenu = async () => {
-        const menu = await axios.get('http://localhost:3004/getallproducts');
+        const menu = await axios.get(API.GET_ALL_PRODUCTS);
         setValues(menu?.data?.data);
     };
 
@@ -341,7 +342,7 @@ const ManageProduct = () => {
                         <div className="modal-forms">
                             <div className="image-container">
                                 {selectedProduct.image ? (
-                                    <img src={`http://localhost:3004/uploads/${selectedProduct.image}`} alt="Product" />
+                                    <img src={`${API.UPLOADS}${selectedProduct.image}`} alt="Product" />
                                 ) : (
                                     <h1>No image</h1>
                                 )}
@@ -412,7 +413,7 @@ const ManageProduct = () => {
                         {filteredValues?.map((pro) => (
                             <TableRow key={pro?._id}>
                                 <TableCell>
-                                    <img src={`http://localhost:3004/uploads/${pro?.image}`} alt='' style={{ width: 60, height: 60, objectFit: 'cover' }} />
+                                    <img src={`${API.UPLOADS}${pro?.image}`} alt='' style={{ width: 60, height: 60, objectFit: 'cover' }} />
                                 </TableCell>
                                 <TableCell>{pro?.name}</TableCell>
                                 <TableCell style={{ maxWidth: 350, minWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={pro?.description}>
@@ -425,15 +426,17 @@ const ManageProduct = () => {
                                 <TableCell>{pro?.stock}</TableCell>
                                 <TableCell>
                                     <Button variant="outlined" onClick={() => handleOpenEditModal(pro)} style={{ marginRight: 8 }}>Edit</Button>
-                                    <Button variant="outlined" color="error" onClick={() => { setSelectedProduct({
-                                        _id: pro?._id,
-                                        productName: pro?.name,
-                                        productDescription: pro?.description,
-                                        productCategory: pro?.category,
-                                        image: pro?.image,
-                                        price: pro?.price,
-                                        stock: pro?.stock
-                                    }); setModalEditOpen(true); }}>Delete</Button>
+                                    <Button variant="outlined" color="error" onClick={() => {
+                                        setSelectedProduct({
+                                            _id: pro?._id,
+                                            productName: pro?.name,
+                                            productDescription: pro?.description,
+                                            productCategory: pro?.category,
+                                            image: pro?.image,
+                                            price: pro?.price,
+                                            stock: pro?.stock
+                                        }); setModalEditOpen(true);
+                                    }}>Delete</Button>
                                 </TableCell>
                             </TableRow>
                         ))}

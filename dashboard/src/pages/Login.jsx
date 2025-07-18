@@ -5,12 +5,13 @@ import {
   Button,
   Modal,
   InputAdornment,
-  FormControlLabel,
-  Checkbox
+  // FormControlLabel,
+  // Checkbox
 } from '@mui/material';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import Lock from '@mui/icons-material/Lock';
 import axios from 'axios';
+import API from './api';
 import './Login.css';
 // Use the new red Bookly logo for login
 const loginImage = '/Red_Booklyp.png';
@@ -19,7 +20,7 @@ function Login() {
   const [ModalStudOpen, setModalStudOpen] = useState(true);
   const [loginID, setLoginID] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   const [loginIDErr, setLoginIDError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ function Login() {
 
     // Buyer login via backend
     try {
-      const response = await axios.post('http://localhost:3004/api/login', {
+      const response = await axios.post(API.LOGIN, {
         loginID,
         password
       });

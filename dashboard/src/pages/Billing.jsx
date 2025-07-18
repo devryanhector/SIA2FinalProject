@@ -1,4 +1,4 @@
-import React from 'react';                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+import React from 'react';
 import {
     Button,
     // TextField,
@@ -9,12 +9,13 @@ import {
     Backdrop,
     Fade,
     Paper,
-    Typography                                          
+    Typography
 } from '@mui/material';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import './Billing.css';
 import axios from 'axios';
+import API from './api';
 
 const Billing = ({
     cart,
@@ -75,7 +76,7 @@ const Billing = ({
             const buyer = localStorage.getItem('username') || 'N/A';
             for (const product of cart) {
                 // Save sales detail with buyer and productId
-                await axios.post('http://localhost:3004/api/salesdetails', {
+                await axios.post(API.SALES_DETAIL, {
                     product: product.name,
                     productId: product._id,
                     quantity: product.quantity,
@@ -83,21 +84,27 @@ const Billing = ({
                     date: new Date(),
                     buyer
                 });
-                const updatedStock = product.stock - product.quantity;
-                await axios.post('http://localhost:3004/editproductstock', {
+                await axios.post(API.EDIT_PRODUCT_STOCK, {
                     productId: product._id,
-                    productStock: updatedStock
+                    quantity: product.quantity
                 });
             }
+            // Notify Products page to update stock UI
+            if (window.onPaymentComplete) {
+                window.onPaymentComplete(cart);
+            }
+            // Clear the cart after successful payment
+            setCart([]);
+        } catch (error) {
+            alert('Error updating stock: ' + error.message);
+        } finally {
             navigate('/receipt', {
                 replace: true,
-                state: { 
+                state: {
                     cart,
                     total: getTotalPrice()
                 }
             });
-        } catch (error) {
-            alert('Error updating stock: ' + error.message);
         }
     };
 

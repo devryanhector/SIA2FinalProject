@@ -23,8 +23,7 @@ const salesDetailSchema = new mongoose.Schema({
     default: Date.now
   },
   buyer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
     required: false
   },
 }, {

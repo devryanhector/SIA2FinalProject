@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import API from './api';
 import './InventoryReport.css';
 
 function InventoryReport() {
@@ -16,7 +17,7 @@ function InventoryReport() {
 
   const fetchReportsData = async () => {
     try {
-      const response = await axios.get('http://localhost:3004/api/reportdetails');
+      const response = await axios.get(API.GET_INVENTORY_REPORT);
       const reports = response.data; // Assuming response.data directly contains the array of reports
 
       if (reports && reports.length > 0) {
@@ -50,7 +51,7 @@ function InventoryReport() {
 
   const fetchSalesDetails = async () => {
     try {
-      const response = await axios.get('http://localhost:3004/api/salesdetails');
+      const response = await axios.get(API.SALES_DETAIL);
       const sales = response.data;
       console.log('Sales details:', sales); // Check what 'sales' contains
       setSalesDetails(sales);

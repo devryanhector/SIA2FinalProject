@@ -8,8 +8,17 @@ import Navbar from './Navbar';
 import PropTypes from 'prop-types';
 import ManageProduct from './ManageProduct';
 import { useNavigate } from 'react-router-dom';
+import API from './api';
 
 function Dashboard({ user, cart, setCart }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  // Remove product from cart by id
+  const handleRemoveFromCart = (id) => {
+    const newCart = cart.filter(item => item._id !== id);
+    setCart(newCart);
+    localStorage.setItem('cart', JSON.stringify(newCart));
+  };
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -33,7 +42,7 @@ function Dashboard({ user, cart, setCart }) {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get('http://localhost:3004/getallproducts');
+      const res = await axios.get(API.GET_ALL_PRODUCTS);
       setProducts(res.data?.data || []);
     } catch (err) {
       console.error('Error fetching products:', err);
@@ -47,6 +56,11 @@ function Dashboard({ user, cart, setCart }) {
   };
 
   const addToCart = (product) => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     setCart(prevCart => {
       const existing = prevCart.find(item => item._id === product._id);
       if (existing) {
@@ -76,7 +90,14 @@ function Dashboard({ user, cart, setCart }) {
 
   return (
     <div className="dashboard">
-      <Navbar cart={cart} scrollToImageSection={scrollToImageSection} />
+      <Navbar
+        cart={cart}
+        onRemoveFromCart={handleRemoveFromCart}
+        scrollToImageSection={scrollToImageSection}
+        onCategorySelect={setSelectedCategory}
+        search={searchTerm}
+        setSearch={setSearchTerm}
+      />
       {user.role === 'buyer' && (
         <div style={{ display: 'flex', justifyContent: 'flex-end', margin: '16px 0' }}>
           {/* Removed Dashboard button for buyer */}
@@ -108,46 +129,73 @@ function Dashboard({ user, cart, setCart }) {
           <p className="error-text">{error}</p>
         ) : (
           <div className="menu-container">
-            {products.map((product) => (
-              <div
-                key={product._id}
-                className="card"
-                onClick={() => openModal(product)}
-              >
-                <div className="image-container">
-                  <img src={`http://localhost:3004/uploads/${product.image}`} alt={product.name} />
-                </div>
-                <div className="label">
-                  <h3>{product.name}</h3>
-                </div>
-                <div className="price">
-                  <p style={{ fontWeight: 600, color: '#B85C38', fontSize: 18, margin: 0 }}>₱{product.price}</p>
-                </div>
-                <div className="description">
-                  <p style={{ fontSize: 14, color: '#444', margin: '8px 0 0 0', minHeight: 36 }}>{product.description}</p>
-                </div>
-                <button
-                  style={{
-                    marginTop: 10,
-                    background: '#B85C38',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 4,
-                    padding: '6px 16px',
-                    cursor: 'pointer',
-                    fontWeight: 500,
-                    fontSize: 15,
-                    transition: 'background 0.2s',
-                  }}
-                  onClick={e => {
-                    e.stopPropagation();
-                    addToCart(product);
-                  }}
+            {products
+              .filter(product => selectedCategory === 'All' || product.category === selectedCategory)
+              .filter(product =>
+                searchTerm.trim() === '' ||
+                product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (product.description && product.description.toLowerCase().includes(searchTerm.toLowerCase()))
+              )
+              .map((product) => (
+                <div
+                  key={product._id}
+                  className="card"
+                  onClick={() => openModal(product)}
                 >
-                  Add to Cart
-                </button>
-              </div>
-            ))}
+                  <div className="image-container">
+                    <img src={API.UPLOADS + product.image} alt={product.name} />
+                  </div>
+                  <div className="label">
+                    <h3>{product.name}</h3>
+                  </div>
+                  <div className="price">
+                    <p style={{ fontWeight: 600, color: '#B85C38', fontSize: 18, margin: 0 }}>₱{product.price}</p>
+                  </div>
+                  <div className="description">
+                    <p style={{ fontSize: 14, color: '#444', margin: '8px 0 0 0', minHeight: 36 }}>{product.description}</p>
+                  </div>
+                  {Number(product.stock) <= 0 ? (
+                    <button
+                      style={{
+                        marginTop: 10,
+                        background: '#aaa',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 4,
+                        padding: '6px 16px',
+                        fontWeight: 500,
+                        fontSize: 15,
+                        cursor: 'not-allowed',
+                        transition: 'background 0.2s',
+                      }}
+                      disabled
+                    >
+                      Out of Stock
+                    </button>
+                  ) : (
+                    <button
+                      style={{
+                        marginTop: 10,
+                        background: '#B85C38',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: 4,
+                        padding: '6px 16px',
+                        cursor: 'pointer',
+                        fontWeight: 500,
+                        fontSize: 15,
+                        transition: 'background 0.2s',
+                      }}
+                      onClick={e => {
+                        e.stopPropagation();
+                        addToCart(product);
+                      }}
+                    >
+                      Add to Cart
+                    </button>
+                  )}
+                </div>
+              ))}
           </div>
         )}
       </div>
@@ -242,7 +290,7 @@ function Dashboard({ user, cart, setCart }) {
           }
         `}</style>
       </footer>
-          </div>
+    </div>
   );
 }
 
@@ -251,6 +299,8 @@ Dashboard.propTypes = {
     name: PropTypes.string,
     role: PropTypes.string,
   }),
+  cart: PropTypes.array.isRequired,
+  setCart: PropTypes.func.isRequired,
 };
 
 export default Dashboard;

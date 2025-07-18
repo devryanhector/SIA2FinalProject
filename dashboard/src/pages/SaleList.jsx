@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import API from './api';
 import './SaleList.css';
 
 export default function SaleList() {
@@ -11,7 +12,7 @@ export default function SaleList() {
 
   const fetchSales = async () => {
     try {
-      const response = await axios.get('http://localhost:3004/api/salesdetails');
+      const response = await axios.get(API.SALES_DETAIL);
       setSales(response.data);
     } catch (error) {
       console.error('Error fetching sales:', error);

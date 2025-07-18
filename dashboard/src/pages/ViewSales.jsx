@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import API from './api';
 
 const ViewSales = () => {
     const [sales, setSales] = useState([]);
@@ -14,8 +15,8 @@ const ViewSales = () => {
         const fetchSalesAndProducts = async () => {
             try {
                 const [salesRes, productsRes] = await Promise.all([
-                    axios.get('http://localhost:3004/api/salesdetails'),
-                    axios.get('http://localhost:3004/getallproducts')
+                    axios.get(API.SALES_DETAIL),
+                    axios.get(API.GET_ALL_PRODUCTS)
                 ]);
                 setSales(salesRes.data);
                 setProducts(productsRes.data.data || []);
@@ -32,6 +33,17 @@ const ViewSales = () => {
     const getStock = (productId) => {
         const prod = products.find(p => p._id === productId);
         return prod ? prod.stock : 'N/A';
+    };
+
+    // Delete sale handler
+    const handleDeleteSale = async (saleId) => {
+        if (!window.confirm('Are you sure you want to delete this sale record?')) return;
+        try {
+            await axios.delete(`${API.SALES_DETAIL}/${saleId}`);
+            setSales(prev => prev.filter(s => s._id !== saleId));
+        } catch (err) {
+            alert('Failed to delete sale record.');
+        }
     };
 
     return (
@@ -53,12 +65,13 @@ const ViewSales = () => {
                                 <TableCell>Stock</TableCell>
                                 <TableCell>Price</TableCell>
                                 <TableCell>Date</TableCell>
+                                <TableCell>Action</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {sales.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} align="center">No sales found.</TableCell>
+                                    <TableCell colSpan={7} align="center">No sales found.</TableCell>
                                 </TableRow>
                             ) : (
                                 sales.map((sale, idx) => (
@@ -69,6 +82,11 @@ const ViewSales = () => {
                                         <TableCell>{getStock(sale.productId)}</TableCell>
                                         <TableCell>₱{sale.price}</TableCell>
                                         <TableCell>{sale.date ? new Date(sale.date).toLocaleString() : ''}</TableCell>
+                                        <TableCell>
+                                            <Button color="error" variant="contained" size="small" onClick={() => handleDeleteSale(sale._id)}>
+                                                Delete
+                                            </Button>
+                                        </TableCell>
                                     </TableRow>
                                 ))
                             )}

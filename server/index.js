@@ -61,27 +61,27 @@ const ConnectToDatabase = async () => {
     }
 }
 
-function getLocalIP() { 
-    const nets = os.networkInterfaces(); 
-    for (const name of Object.keys(nets)) { 
-    for (const net of nets [name]) {
-         if (net.family === "IPv4" && !net.internal) { 
-            return net.address;
-         } 
-        } 
-    } 
-     return "localhost";
-     } 
-     // Start server 
-const PORT = process.env.PORT || 3004; 
-const IP = getLocalIP(); 
+function getLocalIP() {
+    const nets = os.networkInterfaces();
+    for (const name of Object.keys(nets)) {
+        for (const net of nets[name]) {
+            if (net.family === "IPv4" && !net.internal) {
+                return net.address;
+            }
+        }
+    }
+    return "localhost";
+}
+// Start server 
+const PORT = process.env.PORT || 3004;
+const IP = getLocalIP();
 
 // Export for use in controllers 
-module.exports.SERVER_PORT - PORT; 
-module.exports.SERVER_IP - IP; 
+module.exports.SERVER_PORT - PORT;
+module.exports.SERVER_IP - IP;
 
 app.listen(PORT, '0.0.0.0', () => {
-     console.log(' Server running at:'); 
+    console.log(' Server running at:');
     console.log(`Local:   http://localhost:${PORT}`);
     console.log(`Network: http://${IP}:${PORT}`);
 });
@@ -219,13 +219,31 @@ app.put('/edituser/:userId', async (req, res) => {
 
 app.post('/editproductstock', async (req, res) => {
     try {
-        const { productId, productStock } = req.body;
+        const { productId, productStock, quantity } = req.body;
 
-        console.log('Received data for updating product stock:', productId, productStock);
+        console.log('Received data for updating product stock:', productId, productStock, quantity);
 
-        const updatedProduct = await Products.findByIdAndUpdate(productId, {
-            stock: productStock
-        }, { new: true });
+        // If quantity is provided, decrement stock by quantity, but never let stock go below 0
+        let updatedProduct;
+        if (typeof quantity === 'number') {
+            const product = await Products.findById(productId);
+            if (!product) {
+                return res.status(404).json({ success: false, message: 'Product not found!' });
+            }
+            let newStock = product.stock - Math.abs(quantity);
+            if (newStock < 0) newStock = 0;
+            updatedProduct = await Products.findByIdAndUpdate(
+                productId,
+                { stock: newStock },
+                { new: true }
+            );
+        } else {
+            updatedProduct = await Products.findByIdAndUpdate(
+                productId,
+                { stock: productStock },
+                { new: true }
+            );
+        }
 
         if (updatedProduct) {
             res.json({ success: true, message: 'Product stock updated successfully!', data: updatedProduct });

@@ -21,11 +21,11 @@ import {
 } from '@mui/icons-material';
 import './Navbar.css';
 
-function Navbar({ cart = [], onRemoveFromCart = () => {}, scrollToImageSection }) {
+function Navbar({ cart = [], onRemoveFromCart = () => { }, scrollToImageSection, onCategorySelect = () => { }, search = '', setSearch = () => { } }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState('');
   const [cartOpen, setCartOpen] = useState(false);
-  const [search, setSearch] = useState('');
+  // search and setSearch now come from props
   const [anchorEl, setAnchorEl] = useState(null);
   const [settingsAnchorEl, setSettingsAnchorEl] = useState(null);
   const [logoutMsgOpen, setLogoutMsgOpen] = useState(false);
@@ -56,7 +56,8 @@ function Navbar({ cart = [], onRemoveFromCart = () => {}, scrollToImageSection }
 
   const handleSearch = (e) => {
     e.preventDefault();
-    if (search.trim()) navigate(`/search?q=${encodeURIComponent(search)}`);
+    // Just update the search term, don't navigate
+    setSearch(search);
   };
 
   const totalPrice = cart.reduce(
@@ -83,20 +84,23 @@ function Navbar({ cart = [], onRemoveFromCart = () => {}, scrollToImageSection }
 
       {/* Right: Nav Links + Cart & Profile */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-        <Link to="/" className="navbar-link" style={{ color: 'white', fontWeight: 'bold' }} onClick={e => {
-          e.preventDefault();
-          navigate('/');
-          if (typeof scrollToImageSection === 'function') {
-            setTimeout(() => scrollToImageSection(), 100);
-          }
-        }}>Home</Link>
         <Link
           to="/"
           className="navbar-link"
           style={{ color: 'white', fontWeight: 'bold' }}
-          onClick={e => {
-            e.preventDefault();
-            navigate('/');
+          onClick={() => {
+            if (typeof scrollToImageSection === 'function') {
+              setTimeout(() => scrollToImageSection(), 100);
+            }
+          }}
+        >
+          Home
+        </Link>
+        <Link
+          to="/"
+          className="navbar-link"
+          style={{ color: 'white', fontWeight: 'bold' }}
+          onClick={() => {
             setTimeout(() => {
               const menu = document.querySelector('.menu');
               if (menu) menu.scrollIntoView({ behavior: 'smooth' });
@@ -110,7 +114,15 @@ function Navbar({ cart = [], onRemoveFromCart = () => {}, scrollToImageSection }
         </IconButton>
         <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleGenreClose}>
           {genres.map((genre) => (
-            <MenuItem key={genre} onClick={handleGenreClose}>{genre}</MenuItem>
+            <MenuItem
+              key={genre}
+              onClick={() => {
+                handleGenreClose();
+                onCategorySelect(genre);
+              }}
+            >
+              {genre}
+            </MenuItem>
           ))}
         </Menu>
         <IconButton sx={{ color: 'white' }} onClick={handleCartOpen} title="Cart">
@@ -220,3 +232,13 @@ function Navbar({ cart = [], onRemoveFromCart = () => {}, scrollToImageSection }
 }
 
 export default Navbar;
+import PropTypes from 'prop-types';
+
+Navbar.propTypes = {
+  cart: PropTypes.array,
+  onRemoveFromCart: PropTypes.func,
+  scrollToImageSection: PropTypes.func,
+  onCategorySelect: PropTypes.func,
+  search: PropTypes.string,
+  setSearch: PropTypes.func
+};

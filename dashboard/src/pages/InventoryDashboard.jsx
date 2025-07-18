@@ -15,6 +15,7 @@ import ReportIcon from '@mui/icons-material/Report';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 
 import axios from 'axios';
+import API from './api';
 import './InventoryDashboard.css';
 
 const InventoryDashboard = () => {
@@ -56,7 +57,7 @@ const InventoryDashboard = () => {
     useEffect(() => { fetchMenu(); }, []);
     const fetchMenu = async () => {
         try {
-            const response = await axios.get('http://localhost:3004/getallproducts');
+            const response = await axios.get(API.GET_ALL_PRODUCTS);
             setValues(response?.data?.data || []);
         } catch (err) { console.error('Error fetching menu:', err); }
     };
@@ -83,7 +84,7 @@ const InventoryDashboard = () => {
             formData.append('image', productImage);
             formData.append('category', productCategory);
             formData.append('productStock', productStock);
-            await axios.post('http://localhost:3004/addproduct', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+            await axios.post(API.ADD_PRODUCT, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
             fetchMenu(); handleCancel();
         } catch (error) { alert('Error adding product!'); console.error(error); }
     };
@@ -95,13 +96,13 @@ const InventoryDashboard = () => {
         if (!_id || !productName || !productDescription || !productPrice || !productCategory || !productStock) return alert('All fields are required!');
         try {
             const payload = { productId: _id, productName, productPrice, productDescription, category: productCategory, productStock };
-            const res = await axios.post('http://localhost:3004/editproduct', payload);
+            const res = await axios.post(API.EDIT_PRODUCT, payload);
             if (res.data.success) { fetchMenu(); handleCloseEditModal(); } else { alert(res.data.message); }
         } catch (error) { alert('Error updating product!'); console.error(error); }
     };
     const handleDeleteProduct = async () => {
         try {
-            await axios.post('http://localhost:3004/deleteproduct', { productId: selectedProduct._id });
+            await axios.post(API.DELETE_PRODUCT, { productId: selectedProduct._id });
             fetchMenu(); handleCloseEditModal();
         } catch (error) { alert('Error deleting product!'); console.error(error); }
     };
@@ -190,7 +191,7 @@ const InventoryDashboard = () => {
                         <div className="modal-forms">
                             <div className="image-container">
                                 {selectedProduct.image ? (
-                                    <img src={`http://localhost:3004/uploads/${selectedProduct.image}`} alt="Product" />
+                                    <img src={`${API.UPLOADS}${selectedProduct.image}`} alt="Product" />
                                 ) : (
                                     <h3>No Image</h3>
                                 )}
@@ -222,7 +223,7 @@ const InventoryDashboard = () => {
                     {filteredValues.map((pro) => (
                         <div key={pro._id} className="card-edit" onClick={() => handleOpenEditModal(pro)}>
                             <div className="image-container">
-                                <img src={`http://localhost:3004/uploads/${pro.image}`} alt={pro.name} />
+                                <img src={`${API.UPLOADS}${pro.image}`} alt={pro.name} />
                             </div>
                             <div className="label">
                                 <h3>{pro.name}</h3>

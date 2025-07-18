@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import API from './api';
 import './Register.css';
 import { TextField, Button, Typography, Box } from '@mui/material';
 
@@ -20,7 +21,7 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3004/api/users', {
+      await axios.post(API.REGISTER, {
         username: formData.username,
         email: formData.email,
         password: formData.password,

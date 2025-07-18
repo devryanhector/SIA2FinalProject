@@ -1,6 +1,6 @@
 // Centralized API endpoints for the dashboard
 
-const API_BASE = ' http://192.168.9.74:3000';
+const API_BASE = 'http://192.168.9.74:3004';
 
 export const API = {
   // Auth
@@ -29,6 +29,14 @@ export const API = {
   ADD_TO_CART: `${API_BASE}/cart/add`,
   GET_CART: `${API_BASE}/cart`,
   REMOVE_FROM_CART: `${API_BASE}/cart/remove`,
+
+  // Billing & Sales
+  SALES_DETAIL: `${API_BASE}/api/salesdetails`,
+  EDIT_PRODUCT_STOCK: `${API_BASE}/editproductstock`,
+
+  // Uploads
+  UPLOADS: `${API_BASE}/uploads/`,
+
 };
 
 export default API;

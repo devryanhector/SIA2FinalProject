@@ -16,7 +16,8 @@ const ForgotPassword = () => {
     setError(''); setMessage('');
     try {
       // Simulate email check (in real app, send code or link)
-      const res = await axios.post(API.FORGOT_PASSWORD, { email });
+      const res = await axios.post(API.FORGOT_PASSWORD, { email: email.trim().toLowerCase() });
+      console.log('Forgot password API response:', res.data); // Debug log
       if (res.data.success) {
         setStep(2);
         setMessage('Email found. Please enter your new password.');

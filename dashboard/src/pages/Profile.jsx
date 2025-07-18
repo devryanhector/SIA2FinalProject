@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, Paper, Divider } from '@mui/material';
+import { useEffect, useState } from 'react';
+import { Box, Typography, Paper } from '@mui/material';
 import axios from 'axios';
+import API from './api';
 
 function Profile() {
   const [user, setUser] = useState({ username: '', email: '' });
@@ -12,7 +13,7 @@ function Profile() {
       try {
         const token = localStorage.getItem('token');
         if (!token) return;
-        const res = await axios.get('http://localhost:3004/api/users/me', {
+        const res = await axios.get(API.GET_USER('me'), {
           headers: { Authorization: `Bearer ${token}` }
         });
         console.log('Profile.jsx user response:', res.data); // Debug log
@@ -27,7 +28,7 @@ function Profile() {
     const fetchHistory = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:3004/api/salesdetails/user/history', {
+        const res = await axios.get(API.SALES_DETAIL + '/user/history', {
           headers: { Authorization: `Bearer ${token}` }
         });
         setHistory(res.data.history || []);
@@ -40,7 +41,7 @@ function Profile() {
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', mt: 6, p: 3 }}>
-      {/* <Paper sx={{ p: 3, mb: 4 }}>
+      <Paper sx={{ p: 3, mb: 4 }}>
         <Typography variant="h4" fontWeight={700} mb={2} color="primary.main">
           Profile
         </Typography>
@@ -48,7 +49,7 @@ function Profile() {
           Username: {user.username}
         </Typography>
         {user.email && <Typography variant="body1">Email: {user.email}</Typography>}
-      </Paper> */}
+      </Paper>
       <Paper sx={{ p: 3 }}>
         <Typography variant="h5" fontWeight={600} mb={2} color="primary.main">
           Purchase History

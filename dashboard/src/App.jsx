@@ -20,6 +20,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import Profile from './pages/Profile';
 import './App.css';
 import Billing from './pages/Billing';
+// import PublicProductList from './pages/publicproductlist';
 
 function App() {
   // Get userRole from localStorage
@@ -72,6 +73,8 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/billing" element={<Billing cart={cart} setCart={setCart} />} />
+        {/* <Route path="/public-products" element={<PublicProductList />} />
+        <Route path="*" element={<div>404 Not Found</div>} /> */}
       </Routes>
       {/* Pass cart to Navbar globally if needed */}
       {/* <Navbar cart={cart} setCart={setCart} /> */}
